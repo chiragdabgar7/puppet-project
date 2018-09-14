@@ -1,0 +1,14 @@
+  file { '/examples/Dockerfile.nginx':
+    source     => '/examples/Dockerfile.nginx',
+    notify     => Docker::Image['sample-nginx'],
+  }
+
+  docker::image { 'sample-nginx':
+    ensure      => latest,
+  }
+
+  docker::run { 'cont-nginx':
+    image       => 'sample-nginx:latest',
+    ports       => ['80:80'],
+  }
+

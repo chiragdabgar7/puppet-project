@@ -1,0 +1,11 @@
+---
+  test: "This is a test"
+  magic: true
+  users:
+    - 'katy'
+    - 'lark'
+    - 'bridget'
+    - 'charles'
+  tp:
+    - 'jake jake'
+    - 'paul paul'

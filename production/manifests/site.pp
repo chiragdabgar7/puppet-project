@@ -21,9 +21,10 @@ docker::run { 'hello-alpine':
 
 #node definition for puppet-agent1
 node 'puppet-agent1' {
-include apache
+include ::mysql::server
 include docker
 include test_mod
+#include blogpost
   file { '/tmp/test.txt':
     ensure	=> present,
     content	=> "Hey i am in agent",
@@ -38,20 +39,6 @@ include test_mod
 #    }
 #  }  
 
-#  file { '/examples/Dockerfile':
-#     source	=> '/examples/Dockerfile',
-#     notify 	=> Docker::Image['sample-ubuntu'],
-#  }
-
-#  docker::image { 'sample-ubuntu':
-#    ensure	=> 'present',
-#  }
-  
-#  docker::run { 'cont-ubuntu-16.04':
-#    image	=> 'ubuntu:16.04',
-#    ports	=> ['22'],
-#  }
-
 cron { 'cron-example':
     ensure	=> absent,
     command	=> '/bin/date +%F',
@@ -65,11 +52,26 @@ test_mod::users {'homer2':}
 lookup('users').each | String $username | {
   test_mod::users { $username:}
   }
+
+docker::swarm { 'cluster_manager':
+  init			=> true,
+  advertise_addr	=> '192.168.56.20',
+  listen_addr		=> '192.168.56.20',
+#  manager_ip		=> '192.168.56.10',
+#  token			=> 'SWMTKN-1-4680via8tqa5jz3gnyh1ecf3dh9qr9cdb9jvowehd2y3kcblvb-e4mql3sqfh5tts07pjsn1f504',
+}
+
+docker_network { 'my_net':
+  ensure	=> present,
+  driver	=> overlay,
+  subnet	=> '192.168.56.0/24',
+  gateway	=> '192.168.56.1',
+  ip_range	=> '192.168.56.1/24',
+}
 }
 
 #node definition for puppet-agent2
 node 'puppet-agent2' {
-include apache
     file { '/tmp/test.txt':
     ensure      => present,
     content     => "Hey i am in agent1",
@@ -90,5 +92,4 @@ include apache
   class {user_account:
     username        => 'dash',
   }
-
 }
